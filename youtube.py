@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import os
+import pprint
 from pathlib import Path
 import youtube_dl
 class MyLogger(object):
@@ -26,7 +27,14 @@ class Download():
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '320',
-        }],
+        # },{
+        #     'key': 'EmbedThumbnail',
+        #     'already_have_thumbnail': False
+        },{
+            'key': 'MetadataFromTitle',
+            'titleformat': '%(title)s'
+        },{'key': 'FFmpegMetadata'}],
+        'outtmpl': 'mp3/%(title)s-%(id)s.%(ext)s',
         'forcefilename' : True,
         'forcethumbnail' : True,
         'logger': MyLogger(),
@@ -35,8 +43,4 @@ class Download():
 
     def download(self,url):
         with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
-            ydl.extract_info(url)
-            print (filename)
-        # return filename;
-down = Download()
-down.download('ioBQzIsgddI')
+            infodict = ydl.extract_info(url)
