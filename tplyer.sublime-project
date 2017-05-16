@@ -1,0 +1,12 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"settings":
+	{
+		"python_interpreter": "/Users/alexleung/.pyenv/versions/tplayer/bin/python"
+	}
+}
