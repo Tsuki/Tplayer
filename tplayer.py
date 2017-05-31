@@ -28,6 +28,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 file_handler = logging.FileHandler("tplayer.log")
 stream_handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+stream_handler.setFormatter(formatter)
+file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
@@ -44,7 +47,7 @@ def help(bot, update):
 def echo(bot, update):
     update.message.reply_text('try to download {0}'.format(update.message.text))
     user = update.message.from_user
-    logger.info("Request {4} from first_name:{0} ,last_name:{1} ,username:{2}"
+    logger.info("Request {3} from first_name:{0} ,last_name:{1} ,username:{2}"
             .format(user.first_name,user.last_name,user.username,update.message.text))
     chat_id = update.message.chat_id
     try:
