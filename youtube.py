@@ -22,18 +22,18 @@ class Download():
             filename = os.path.splitext(d["filename"])[0]+'.mp3'
 
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '320',
-        # },{
-        #     'key': 'EmbedThumbnail',
-        #     'already_have_thumbnail': False
-        },{
-            'key': 'MetadataFromTitle',
-            'titleformat': '%(title)s'
-        },{'key': 'FFmpegMetadata'}],
+        'format': '140/139',
+        'nooverwrites': True,
+        'postprocessors': [
+         # {'key': 'FFmpegExtractAudio',
+         #   'preferredcodec': 'mp3',
+         #   'preferredquality': '320'}
+         #,{'key': 'EmbedThumbnail',
+         #    'already_have_thumbnail': False}
+         {'key': 'MetadataFromTitle',
+             'titleformat': '%(title)s'}
+         #,{'key': 'FFmpegMetadata'}
+        ],
         'outtmpl': 'mp3/%(title)s-%(id)s.%(ext)s',
         'forcefilename' : True,
         'forcethumbnail' : True,

@@ -16,7 +16,7 @@ bot.
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
-import glob, os, sys
+import glob, os, sys, time
 from youtube import Download
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -41,7 +41,7 @@ def echo(bot, update):
     try:
         d = Download()
         d.download(update.message.text)
-        file = glob.glob('./mp3/*{0}.mp3'.format(update.message.text))
+        file = glob.glob('./mp3/*{0}.m4a'.format(update.message.text))
         print (file)
         bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'))
     except Exception as e:

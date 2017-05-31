@@ -1,5 +1,6 @@
 certifi==2017.4.17
 future==0.16.0
+mutagen==1.37
 python-telegram-bot==5.3.1
 urllib3==1.20
-youtube-dl==2017.5.14
+youtube-dl==2017.5.18.1
