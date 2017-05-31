@@ -3,6 +3,7 @@ import os
 import pprint
 from pathlib import Path
 import youtube_dl
+from pprint import pprint
 class MyLogger(object):
     def debug(self, msg):
         print("debug: "+msg)
@@ -44,3 +45,4 @@ class Download():
     def download(self,url):
         with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
             infodict = ydl.extract_info(url)
+        return infodict

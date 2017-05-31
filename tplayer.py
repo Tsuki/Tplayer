@@ -18,12 +18,18 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import glob, os, sys, time
 from youtube import Download
+from mutagen.mp4 import MP4
+from pprint import pprint
+import urllib.parse as urlparse
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-
+file_handler = logging.FileHandler("tplayer.log")
+stream_handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -37,12 +43,20 @@ def help(bot, update):
 
 def echo(bot, update):
     update.message.reply_text('try to download {0}'.format(update.message.text))
+    user = update.message.from_user
+    logger.info("Request {4} from first_name:{0} ,last_name:{1} ,username:{2}"
+            .format(user.first_name,user.last_name,user.username,update.message.text))
     chat_id = update.message.chat_id
     try:
         d = Download()
-        d.download(update.message.text)
-        file = glob.glob('./mp3/*{0}.m4a'.format(update.message.text))
+        parsed = update.message.text.split("&list=")[0]
+        infodict = d.download(parsed)
+        file = glob.glob('./mp3/*{0}.m4a'.format(infodict['display_id']))
         print (file)
+        audio = MP4(file[0])
+        audio["\xa9nam"] = infodict['title']
+        audio["\xa9ART"] = infodict['uploader']
+        audio.save()
         bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'))
     except Exception as e:
         logger.error(e)
