@@ -60,7 +60,7 @@ def echo(bot, update):
         audio["\xa9nam"] = infodict['title']
         audio["\xa9ART"] = infodict['uploader']
         audio.save()
-        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'))
+        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'),timeout=200)
     except Exception as e:
         logger.error(e)
         update.message.reply_text('System error'+str(e))
