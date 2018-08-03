@@ -35,7 +35,7 @@ class Download():
              'titleformat': '%(title)s'}
          #,{'key': 'FFmpegMetadata'}
         ],
-        'outtmpl': 'mp3/%(title)s-%(id)s.%(ext)s',
+        'outtmpl': 'mp3/%(id)s.%(ext)s',
         'forcefilename' : True,
         'forcethumbnail' : True,
         'logger': MyLogger(),

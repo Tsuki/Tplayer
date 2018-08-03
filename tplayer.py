@@ -45,10 +45,11 @@ def help(bot, update):
 
 
 def echo(bot, update):
-    update.message.reply_text('try to download {0}'.format(update.message.text))
+    sent_message = update.message.reply_text('try to download {0}'.format(update.message.text))
     user = update.message.from_user
-    logger.info("Request {3} from first_name:{0} ,last_name:{1} ,username:{2}"
-            .format(user.first_name,user.last_name,user.username,update.message.text))
+    logger.info("Request {3} from chat_id:{4} first_name:{0} ,last_name:{1} ,username:{2}"
+            .format(user.first_name,user.last_name,user.username,update.message.text,update.message.chat_id
+))
     chat_id = update.message.chat_id
     try:
         d = Download()
@@ -60,7 +61,9 @@ def echo(bot, update):
         audio["\xa9nam"] = infodict['title']
         audio["\xa9ART"] = infodict['uploader']
         audio.save()
-        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'),timeout=200)
+        bot.edit_message_text(f'{infodict["title"]} downloaded',chat_id=chat_id,message_id=sent_message.message_id)
+        # bot.send_document(chat_id=chat_id, document=open(file[0], 'rb'),timeout=200)
+        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'),timeout=200,title=infodict['title'])
     except Exception as e:
         logger.error(e)
         update.message.reply_text('System error'+str(e))
