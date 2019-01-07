@@ -63,7 +63,7 @@ def echo(bot, update):
         audio.save()
         bot.edit_message_text(f'{infodict["title"]} downloaded',chat_id=chat_id,message_id=sent_message.message_id)
         # bot.send_document(chat_id=chat_id, document=open(file[0], 'rb'),timeout=200)
-        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'),timeout=200,title=infodict['title'])
+        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'),timeout=2000,title=infodict['title'])
     except Exception as e:
         logger.error(e)
         update.message.reply_text('System error'+str(e))
@@ -89,7 +89,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, echo))
 
     # log all errors
-    dp.add_error_handler(error)
+    # dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()
