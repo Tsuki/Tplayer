@@ -14,15 +14,18 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import glob
 import logging
-import glob, os, sys, time
-from youtube import Download
+import os
+import sys
+
 from mutagen.mp4 import MP4
-from pprint import pprint
-import urllib.parse as urlparse
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+from youtube import Download
+
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', stream=sys.stdout,
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
@@ -32,7 +35,10 @@ formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message
 stream_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
+
+
+# logger.addHandler(stream_handler)
+
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -44,35 +50,56 @@ def help(bot, update):
     update.message.reply_text('Help!')
 
 
-def echo(bot, update):
-    logger.info(dir(update))
+def private(bot, update):
     sent_message = update.message.reply_text('try to download {0}'.format(update.message.text))
     user = update.message.from_user
-    logger.info("Request {3} from chat_id:{4} first_name:{0} ,last_name:{1} ,username:{2}"
-            .format(user.first_name,user.last_name,user.username,update.message.text,update.message.chat_id
-))
+    logger.info(
+        f"Request {update.message.text} from chat_id:{update.message.chat_id} first_name:{user.first_name} ,"
+        f"last_name:{user.last_name} ,username:{user.username}")
     chat_id = update.message.chat_id
     try:
-        d = Download()
-        parsed = update.message.text.split("&list=")[0]
-        infodict = d.download(parsed)
-        file = glob.glob('./mp3/*{0}.m4a'.format(infodict['display_id']))
-        print (file)
-        audio = MP4(file[0])
-        audio["\xa9nam"] = infodict['title']
-        audio["\xa9ART"] = infodict['uploader']
-        audio.save()
-        bot.edit_message_text(f'{infodict["title"]} downloaded',chat_id=chat_id,message_id=sent_message.message_id)
-        # bot.send_document(chat_id=chat_id, document=open(file[0], 'rb'),timeout=200)
-        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'),timeout=2000,title=infodict['title'])
+        infodict, file = download(update.message.text.split("&list=")[0])
+        bot.edit_message_text(f'{infodict["title"]} downloaded', chat_id=chat_id, message_id=sent_message.message_id)
+        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'), timeout=2000, title=infodict['title'])
     except Exception as e:
         logger.error(e)
-        update.message.reply_text('System error'+str(e))
+        update.message.reply_text('System error' + str(e))
 
+
+def channel(bot, update):
+    if not update.channel_post:
+        logger.warning(f"{update}")
+        return
+    post = update.channel_post
+    sent_message = post.reply_text('try to download {0}'.format(post.text))
+    logger.info(post)
+    logger.info(f"Request {post.text} from chat_id:{post.chat_id}")
+    chat_id = post.chat_id
+    try:
+        infodict, file = download(post.text.split("&list=")[0])
+        bot.edit_message_text(f'{infodict["title"]} downloaded', chat_id=chat_id, message_id=sent_message.message_id)
+        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'), timeout=2000, title=infodict['title'],
+                       reply_to_message_id=post.message_id)
+    #     ADD thumb
+    except Exception as e:
+        logger.error(e)
+        post.reply_text('System error' + str(e))
+
+
+def download(parsed):
+    d = Download()
+    infodict = d.download(parsed)
+    file = glob.glob('./mp3/*{0}.m4a'.format(infodict['display_id']))
+    print(file)
+    audio = MP4(file[0])
+    audio["\xa9nam"] = infodict['title']
+    audio["\xa9ART"] = infodict['uploader']
+    audio.save()
+    return infodict, file
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+    logger.warning('Update "%s" caused error "%s"' % (update, error))
 
 
 def main():
@@ -87,8 +114,8 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler((Filters.text), echo))
-    # dp.add_handler(MessageHandler((Filters.text & Filters.private), echo))
+    dp.add_handler(MessageHandler((Filters.text & Filters.private), private))
+    dp.add_handler(MessageHandler(Filters.text, channel))
 
     # log all errors
     # dp.add_error_handler(error)

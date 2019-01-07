@@ -103,3 +103,4 @@ ENV/
 # custom
 mp3/
 !.gitkeep
+.idea
