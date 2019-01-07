@@ -45,6 +45,7 @@ def help(bot, update):
 
 
 def echo(bot, update):
+    logger.info(dir(update))
     sent_message = update.message.reply_text('try to download {0}'.format(update.message.text))
     user = update.message.from_user
     logger.info("Request {3} from chat_id:{4} first_name:{0} ,last_name:{1} ,username:{2}"
@@ -86,7 +87,8 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler((Filters.text), echo))
+    # dp.add_handler(MessageHandler((Filters.text & Filters.private), echo))
 
     # log all errors
     # dp.add_error_handler(error)
