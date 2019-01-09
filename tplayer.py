@@ -115,7 +115,7 @@ def main():
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler((Filters.text & Filters.private), private))
-    dp.add_handler(MessageHandler(Filters.text, channel))
+    dp.add_handler(CommandHandler("download", channel))
 
     # log all errors
     # dp.add_error_handler(error)
