@@ -67,12 +67,13 @@ def private(bot, update):
 
 
 def channel(bot, update):
-    if not update.channel_post and not update.channel_post.text.startswith('/dl'):
+    print(update.channel_post.text)
+    if not update.channel_post and update.channel_post.text.startswith('/dl'):
         logger.warning(f"{update}")
         return
     post = update.channel_post
+    post.text = post.text[4:]
     sent_message = post.reply_text('try to download {0}'.format(post.text))
-    logger.info(post)
     logger.info(f"Request {post.text} from chat_id:{post.chat_id}")
     chat_id = post.chat_id
     try:
@@ -115,7 +116,7 @@ def main():
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler((Filters.text & Filters.private), private))
-    dp.add_handler(MessageHandler(Filters.text, channel))
+    dp.add_handler(MessageHandler(Filters.command, channel))
 
     # log all errors
     # dp.add_error_handler(error)
