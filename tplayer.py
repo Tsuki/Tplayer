@@ -67,7 +67,7 @@ def private(bot, update):
 
 
 def channel(bot, update):
-    if not update.channel_post:
+    if not update.channel_post and not update.channel_post.text.startswith('/dl'):
         logger.warning(f"{update}")
         return
     post = update.channel_post
@@ -115,7 +115,7 @@ def main():
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler((Filters.text & Filters.private), private))
-    dp.add_handler(CommandHandler("download", channel))
+    dp.add_handler(MessageHandler(Filters.text, channel))
 
     # log all errors
     # dp.add_error_handler(error)
