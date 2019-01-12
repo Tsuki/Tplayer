@@ -17,11 +17,11 @@ class MyLogger(object):
 class Download():
     filename = ""
 
-    def my_hook(d):
-        if d['status'] == 'finished':
+    def my_hook(self):
+        if self['status'] == 'finished':
             print('Done downloading, now converting ...')
-            print(d["filename"])
-            filename = os.path.splitext(d["filename"])[0] + '.mp3'
+            print(self["filename"])
+            filename = os.path.splitext(self["filename"])[0] + '.mp3'
 
     ydl_opts = {
         'format': '140/139',

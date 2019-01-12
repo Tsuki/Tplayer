@@ -15,13 +15,15 @@ bot.
 """
 
 import glob
+import io
 import logging
 import os
 import sys
-
-from mutagen.mp4 import MP4
+import tempfile
+from PIL import Image
+from mutagen.mp4mutagen.mp4 import MP4
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
+import urllib.request
 from youtube import Download
 
 # Enable logging
@@ -67,7 +69,6 @@ def private(bot, update):
 
 
 def channel(bot, update):
-    print(update.channel_post.text)
     if not update.channel_post and update.channel_post.text.startswith('/dl'):
         logger.warning(f"{update}")
         return
@@ -78,13 +79,22 @@ def channel(bot, update):
     chat_id = post.chat_id
     try:
         infodict, file = download(post.text.split("&list=")[0])
-        bot.edit_message_text(f'{infodict["title"]} downloaded', chat_id=chat_id, message_id=sent_message.message_id)
-        bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'), timeout=2000, title=infodict['title'],
-                       reply_to_message_id=post.message_id)
+        bot.edit_message_text(f'{infodict["title"]} downloaded', chat_id=chat_id,
+                              message_id=sent_message.message_id)
+        with tempfile.TemporaryFile() as f:
+            f.write(urllib.request.urlopen(infodict['thumbnail']).read())
+            f.flush()
+            im = Image.open(f)
+            im.thumbnail((90, 90), Image.ANTIALIAS)
+            img_byte_arr = io.BytesIO()
+            im.save(img_byte_arr, format='JPEG')
+            bot.send_audio(chat_id=chat_id, audio=open(file[0], 'rb'), timeout=2000, title=infodict["title"],
+                           thumb=img_byte_arr.getvalue(),
+                           reply_to_message_id=post.message_id)
     #     ADD thumb
     except Exception as e:
         logger.error(e)
-        post.reply_text('System error' + str(e))
+        post.reply_text(f'System error {str(e)}')
 
 
 def download(parsed):
