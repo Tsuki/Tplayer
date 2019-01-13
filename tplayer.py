@@ -21,7 +21,7 @@ import os
 import sys
 import tempfile
 from PIL import Image
-from mutagen.mp4mutagen.mp4 import MP4
+from mutagen.mp4 import MP4
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import urllib.request
 from youtube import Download
